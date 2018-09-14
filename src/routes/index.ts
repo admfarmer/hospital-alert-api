@@ -6,16 +6,20 @@ import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 module.exports = (fastify, { }, next) => {
   var db: Knex = fastify.knex;
 
-  fastify.get('/hello', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
-    req.log.info('hello');
+  fastify.get('/hello', async (request: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
+    request.log.info('hello');
     reply.send({ hello: 'world' })
   })
 
-  fastify.get('/hi', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
-    reply.send({ hi: 'world' })
+  fastify.get('/sign-token', async (request: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
+    const token = fastify.jwt.sign({ foo: 'bar' }, { expiresIn: '1d' });
+    reply.send({ token: token });
   })
 
-  fastify.get('/test-db', async (req, reply) => {
+  fastify.get('/test-db', {
+    beforeHandler: [fastify.authenticate]
+  }, async (request, reply) => {
+    console.log(request.user);
     var rs = await db('users').select('id', 'username', 'fullname');
     reply.code(200).send({ ok: true, rows: rs })
   })

@@ -1,15 +1,41 @@
 require('dotenv').config();
-
+import * as HttpStatus from 'http-status-codes';
 import * as fastify from 'fastify';
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
 const path = require('path');
-const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' } });
+const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
 
 server.register(require('fastify-static'), {
   root: path.join(__dirname, '../public'),
   prefix: '/html',
+});
+
+server.register(require('fastify-jwt'), {
+  secret: process.env.SECRET_KEY
+});
+
+server.decorate("authenticate", async (request, reply) => {
+  let token: string = null;
+
+  if (request.headers.authorization && request.headers.authorization.split(' ')[0] === 'Bearer') {
+    token = request.headers.authorization.split(' ')[1];
+  } else if (request.query && request.query.token) {
+    token = request.query.token;
+  } else {
+    token = request.body.token;
+  }
+
+  try {
+    const decoded = await request.jwtVerify(token);
+  } catch (err) {
+    reply.status(HttpStatus.UNAUTHORIZED).send({
+      statusCode: HttpStatus.UNAUTHORIZED,
+      error: HttpStatus.getStatusText(HttpStatus.UNAUTHORIZED),
+      message: 'Access denied!'
+    })
+  }
 });
 
 server.register(require('fastify-knexjs'), {
@@ -26,9 +52,6 @@ server.register(require('fastify-knexjs'), {
 server.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
 server.use(require('cors')());
-// public assets
-// server.use('/html', serveStatic('./public'));
-// server.use('/assets', serveStatic('./assets'));
 
 server.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
   reply.code(200).send({ message: 'Fastify, RESTful API services!' })
