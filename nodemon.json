@@ -10,5 +10,5 @@
     "src"
   ],
   "ext": "ts",
-  "exec": "ts-node ./src/bin/www.ts"
+  "exec": "ts-node ./src/server.ts"
 }

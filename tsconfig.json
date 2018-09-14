@@ -5,9 +5,20 @@
     "strict": false,
     "removeComments": true,
     "sourceMap": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "outDir": "dist",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/@types/*",
+        "./types/*"
+      ]
+    }
   },
-  "exclude":[
+  "exclude": [
     "node_modules"
-  ]
+  ],
 }
