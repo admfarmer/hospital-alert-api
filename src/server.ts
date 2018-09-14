@@ -1,10 +1,16 @@
 require('dotenv').config();
 
 import * as fastify from 'fastify';
+
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-const serveStatic = require('serve-static');
-const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({});
+const path = require('path');
+const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' } });
+
+server.register(require('fastify-static'), {
+  root: path.join(__dirname, '../public'),
+  prefix: '/html',
+});
 
 server.register(require('fastify-knexjs'), {
   client: 'pg',
@@ -21,8 +27,8 @@ server.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
 server.use(require('cors')());
 // public assets
-server.use('/html', serveStatic('./public'));
-server.use('/assets', serveStatic('./assets'));
+// server.use('/html', serveStatic('./public'));
+// server.use('/assets', serveStatic('./assets'));
 
 server.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
   reply.code(200).send({ message: 'Fastify, RESTful API services!' })
