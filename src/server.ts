@@ -4,8 +4,23 @@ import * as fastify from 'fastify';
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-const path = require('path');
+const path = require('path')
+const helmet = require('fastify-helmet')
+
 const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
+
+server.register(require('fastify-formbody'));
+server.register(require('fastify-cors'), {});
+server.register(require('fastify-no-icon'));
+server.register(
+  helmet,
+  { hidePoweredBy: { setTo: 'PHP 5.2.0' } }
+);
+
+server.register(require('fastify-rate-limit'), {
+  max: 100,
+  timeWindow: '1 minute'
+});
 
 server.register(require('fastify-static'), {
   root: path.join(__dirname, '../public'),
@@ -50,8 +65,6 @@ server.register(require('fastify-knexjs'), {
 });
 
 server.register(require('./routes/index'), { prefix: '/v1', logger: true });
-
-server.use(require('cors')());
 
 server.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
   reply.code(200).send({ message: 'Fastify, RESTful API services!' })
