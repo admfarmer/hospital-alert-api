@@ -4,8 +4,8 @@ import * as fastify from 'fastify';
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-const path = require('path')
-const helmet = require('fastify-helmet')
+const path = require('path');
+const helmet = require('fastify-helmet');
 
 const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
 

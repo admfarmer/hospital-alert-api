@@ -1,9 +1,13 @@
 import * as Knex from 'knex';
 import * as fastify from 'fastify';
 
+import { UserModel } from '../models/user';
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-module.exports = (fastify, { }, next) => {
+const userModel = new UserModel();
+
+const router = (fastify, { }, next) => {
+
   var db: Knex = fastify.knex;
 
   fastify.get('/hello', async (request: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
@@ -20,10 +24,12 @@ module.exports = (fastify, { }, next) => {
     beforeHandler: [fastify.authenticate]
   }, async (request, reply) => {
     console.log(request.user);
-    var rs = await db('users').select('id', 'username', 'fullname');
+    var rs = await userModel.getUser(db);
     reply.code(200).send({ ok: true, rows: rs })
   })
 
-  next()
+  next();
 
 }
+
+module.exports = router;
