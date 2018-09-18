@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "npx ts-node ./src/app.ts",
-    "watch": "npx nodemon"
+    "dev": "npx nodemon",
+    "build": "npx tsc"
   },
   "dependencies": {
     "dotenv": "^6.0.0",
