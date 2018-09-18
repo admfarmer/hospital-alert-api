@@ -1,6 +1,9 @@
+/// <reference path="../typings.d.ts" />
+
 require('dotenv').config();
 import * as HttpStatus from 'http-status-codes';
 import * as fastify from 'fastify';
+import * as Knex from 'knex';
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
@@ -67,6 +70,7 @@ app.register(require('fastify-knexjs'), {
 app.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
 app.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
+  var db: Knex = app.Knex;
   reply.code(200).send({ message: 'Fastify, RESTful API services!' })
 });
 

@@ -1,3 +1,5 @@
+/// <reference path="../../typings.d.ts" />
+
 import * as Knex from 'knex';
 import * as fastify from 'fastify';
 
