@@ -4,34 +4,34 @@ import * as fastify from 'fastify';
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-const path = require('path');
-const helmet = require('fastify-helmet');
+import path = require('path');
+import helmet = require('fastify-helmet');
 
-const server: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
+const app: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
 
-server.register(require('fastify-formbody'));
-server.register(require('fastify-cors'), {});
-server.register(require('fastify-no-icon'));
-server.register(
+app.register(require('fastify-formbody'));
+app.register(require('fastify-cors'), {});
+app.register(require('fastify-no-icon'));
+app.register(
   helmet,
   { hidePoweredBy: { setTo: 'PHP 5.2.0' } }
 );
 
-server.register(require('fastify-rate-limit'), {
+app.register(require('fastify-rate-limit'), {
   max: 100,
   timeWindow: '1 minute'
 });
 
-server.register(require('fastify-static'), {
+app.register(require('fastify-static'), {
   root: path.join(__dirname, '../public'),
   prefix: '/html',
 });
 
-server.register(require('fastify-jwt'), {
+app.register(require('fastify-jwt'), {
   secret: process.env.SECRET_KEY
 });
 
-server.decorate("authenticate", async (request, reply) => {
+app.decorate("authenticate", async (request, reply) => {
   let token: string = null;
 
   if (request.headers.authorization && request.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -53,7 +53,7 @@ server.decorate("authenticate", async (request, reply) => {
   }
 });
 
-server.register(require('fastify-knexjs'), {
+app.register(require('fastify-knexjs'), {
   client: 'pg',
   connection: {
     host: process.env.DB_HOST,
@@ -64,15 +64,15 @@ server.register(require('fastify-knexjs'), {
   }
 });
 
-server.register(require('./routes/index'), { prefix: '/v1', logger: true });
+app.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
-server.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
+app.get('/', async (req: fastify.FastifyRequest<ServerRequest>, reply: fastify.FastifyReply<ServerResponse>) => {
   reply.code(200).send({ message: 'Fastify, RESTful API services!' })
 });
 
 const port = +process.env.PORT || 3000;
 
-server.listen(port, (err) => {
+app.listen(port, (err) => {
   if (err) throw err;
-  console.log(server.server.address());
+  console.log(app.server.address());
 });
