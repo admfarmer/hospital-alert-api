@@ -21,7 +21,7 @@ app.register(
 );
 
 app.register(require('fastify-rate-limit'), {
-  max: 100,
+  max: +process.env.MAX_CONNECTION_PER_MINUTE || 1000,
   timeWindow: '1 minute'
 });
 
