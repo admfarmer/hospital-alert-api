@@ -1,13 +1,12 @@
 /// <reference path="../typings.d.ts" />
-
-require('dotenv').config();
+import path = require('path');
 import * as HttpStatus from 'http-status-codes';
 import * as fastify from 'fastify';
-import * as Knex from 'knex';
+
+require('dotenv').config({ path: path.join(__dirname, '../config') });
 
 import { Server, IncomingMessage, ServerResponse, ServerRequest } from 'http';
 
-import path = require('path');
 import helmet = require('fastify-helmet');
 
 const app: fastify.FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: { level: 'info' }, bodyLimit: 5 * 1048576 });
