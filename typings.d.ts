@@ -9,6 +9,14 @@ declare module 'fastify' {
     user: any
   }
 
+  interface FastifyReply<HttpResponse> {
+
+  }
+
+
+  interface Request extends FastifyRequest<IncomingMessage> { }
+  interface Reply extends FastifyReply<ServerResponse> { }
+
   interface FastifyInstance {
     Knex: Knex;
   }
