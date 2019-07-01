@@ -58,26 +58,40 @@ app.decorate("authenticate", async (request, reply) => {
   }
 });
 
-app.register(require('fastify-knexjs'), {
-  client: 'pg',
+app.register(require('./plugins/db'), {
   connection: {
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    port: +process.env.DB_PORT,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-  }
+    client: 'mysql',
+    connection: {
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      port: +process.env.DB_PORT,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    },
+    pool: {
+      min: 0,
+      max: 7,
+      afterCreate: (conn, done) => {
+        conn.query('SET NAMES utf8', (err) => {
+          done(err, conn);
+        });
+      }
+    },
+    debug: false,
+  },
+  connectionName: 'db'
 });
 
 app.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
-app.get('/', async (req: fastify.FastifyRequest<http.IncomingMessage>, reply: fastify.FastifyReply<http.ServerResponse>) => {
-  reply.code(200).send({ message: 'Fastify, RESTful API services!' })
+app.get('/', async (req: fastify.Request, reply: fastify.Reply) => {
+  reply.code(200).send({ message: 'Welcome to SMART HIS API services!', version: '1.0 build 20190522-1' })
 });
 
-const port = +process.env.PORT || 3000;
+const port = +process.env.HTTP_PORT || 3001;
+const host = process.env.HTTP_ADDRESS || '0.0.0.0';
 
-app.listen(port, (err) => {
+app.listen(port, host, (err) => {
   if (err) throw err;
   console.log(app.server.address());
 });

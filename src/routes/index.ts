@@ -2,38 +2,80 @@
 
 import * as Knex from 'knex';
 import * as fastify from 'fastify';
-import * as http from 'http'
 
-import { UserModel } from '../models/user';
-
-const userModel = new UserModel();
+import { AlertModel } from '../models/alert';
+import * as HttpStatus from 'http-status-codes';
+const alertModel = new AlertModel();
 
 const router = (fastify, { }, next) => {
 
-  var db: Knex = fastify.knex;
+  var db: Knex = fastify.db;
 
-  fastify.get('/hello', async (req: fastify.Request, reply: fastify.Reply) => {
-    req.log.info('hello');
-    reply.send({ hello: 'world' });
-  })
+  fastify.get('/', async (req: fastify.Request, reply: fastify.Reply) => {
+    reply.code(200).send({ message: 'Welcome to SMART HIS API services!', version: '1.0 build 20190522-1' })
+  });
 
-  fastify.get('/sign-token', async (req: Request, reply: fastify.Reply) => {
-    const token = fastify.jwt.sign({ foo: 'bar' }, { expiresIn: '1d' });
-    reply.send({ token: token });
-  })
-
-  fastify.get('/test-db', {
-    beforeHandler: [fastify.authenticate]
-  }, async (req: fastify.Request, reply: fastify.Reply) => {
-    console.log(req.user);
+  fastify.get('/info', async (req: fastify.Request, reply: fastify.Reply) => {
     try {
-      var rs = await userModel.getUser(db);
-      reply.code(200).send({ ok: true, rows: rs });
+      const rs: any = await alertModel.getInfo(db);
+      reply.code(HttpStatus.OK).send({ info: rs })
     } catch (error) {
-      req.log.error(error);
-      reply.code(500).send({ ok: false, error: error.message });
+      console.log(error);
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
   });
+
+  fastify.get('/alertStart', async (req: fastify.Request, reply: fastify.Reply) => {
+    try {
+      const rs: any = await alertModel.getAlertStart(db);
+      reply.code(HttpStatus.OK).send({ info: rs })
+    } catch (error) {
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  });
+
+  fastify.get('/alertStop', async (req: fastify.Request, reply: fastify.Reply) => {
+    try {
+      const rs: any = await alertModel.getAlertStop(db);
+      reply.code(HttpStatus.OK).send({ info: rs })
+    } catch (error) {
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  });
+
+  fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
+    const info: any = req.body.datas;
+    try {
+      const rs: any = await alertModel.insert(db, info);
+      reply.code(HttpStatus.OK).send({ info: rs })
+    } catch (error) {
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  });
+
+  fastify.put('/update/:alertId', async (req: fastify.Request, reply: fastify.Reply) => {
+    const info: any = req.body.datas;
+    const alertId: any = req.params.alertId;
+
+    try {
+      const rs: any = await alertModel.update(db, alertId, info);
+      reply.code(HttpStatus.OK).send({ info: rs })
+    } catch (error) {
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  });
+
+  fastify.delete('/remove/:userId', async (req: fastify.Request, reply: fastify.Reply) => {
+    const alertId: any = req.params.alertId;
+
+    try {
+      await alertModel.remove(db, alertId);
+      reply.status(HttpStatus.OK).send({ statusCode: HttpStatus.OK })
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  })
 
   next();
 

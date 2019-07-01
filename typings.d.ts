@@ -10,7 +10,7 @@ declare module 'fastify' {
   interface Request extends FastifyRequest<IncomingMessage> { }
   interface Reply extends FastifyReply<ServerResponse> { }
   interface FastifyInstance {
-    Knex: Knex;
+    db: Knex;
   }
 }
 
