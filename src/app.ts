@@ -82,6 +82,13 @@ app.register(require('./plugins/db'), {
   connectionName: 'db'
 });
 
+// MQTT
+app.register(require('./plugins/mqtt'), {
+  host: process.env.INTERNAL_NOTIFY_SERVER,
+  username: process.env.LOCAL_NOTIFY_USER,
+  password: process.env.LOCAL_NOTIFY_PASSWORD
+});
+
 app.register(require('./routes/index'), { prefix: '/v1', logger: true });
 
 app.get('/', async (req: fastify.Request, reply: fastify.Reply) => {

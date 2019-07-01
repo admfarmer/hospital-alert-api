@@ -9,11 +9,29 @@ export class AlertModel {
   }
 
   getAlertStart(db: knex) {
-    return db(this.tableName).where('status_flg', 'Y')
+    return db('alert_log as l')
+      .select('l.*')
+      .select(db.raw(`a.AMPHUR_NAME as amp_name`))
+      .select(db.raw(`p.PROVINCE_NAME as prov_name`))
+      .innerJoin('alert_amphur as a', { 'a.AMPHUR_CODE': 'l.amphur' })
+      .innerJoin('alert_province as p', { 'p.PROVINCE_CODE': 'l.province' })
+      .where('l.status_flg', 'Y')
+      .orderBy('l.id', 'DESC');
   }
 
   getAlertStop(db: knex) {
-    return db(this.tableName).where('status_flg', 'N')
+    return db('alert_log as l')
+      .select('l.*')
+      .select(db.raw(`a.AMPHUR_NAME as amp_name`))
+      .select(db.raw(`p.PROVINCE_NAME as prov_name`))
+      .innerJoin('alert_amphur as a', { 'a.AMPHUR_CODE': 'l.amphur' })
+      .innerJoin('alert_province as p', { 'p.PROVINCE_CODE': 'l.province' })
+      .where('l.status_flg', 'N')
+      .orderBy('l.id', 'DESC');
+  }
+
+  statusFlg(db: knex, alertId: any, info: any) {
+    return db(this.tableName).where('id', alertId).update(info);
   }
 
   insert(db: knex, info: any) {
