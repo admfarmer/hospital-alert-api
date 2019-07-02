@@ -56,6 +56,8 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
+    console.log(req.body);
+
     const info: any = req.body;
     // let info = {
     //   hos_name: 'โรงพยาบาลตาลสุม',
@@ -65,7 +67,7 @@ const router = (fastify, { }, next) => {
     //   create_time: '03:24:18',
     //   status_flg: 'Y'
     // }
-    // console.log(info);
+    console.log(info);
     try {
       const rs: any = await alertModel.insert(db, info);
       reply.code(HttpStatus.OK).send({ info: rs })
