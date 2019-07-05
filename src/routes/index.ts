@@ -4,8 +4,12 @@ import * as Knex from 'knex';
 import * as fastify from 'fastify';
 
 import { AlertModel } from '../models/alert';
+import { BotlineModel } from '../models/botline';
+
 import * as HttpStatus from 'http-status-codes';
+
 const alertModel = new AlertModel();
+const botlineModel = new BotlineModel();
 
 const router = (fastify, { }, next) => {
 
@@ -20,7 +24,7 @@ const router = (fastify, { }, next) => {
       const rs: any = await alertModel.getInfo(db);
       reply.code(HttpStatus.OK).send({ info: rs })
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
   });
@@ -56,8 +60,7 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
-    console.log(req.body);
-
+    // console.log(req.body);
     const info: any = req.body;
     // let info = {
     //   hos_name: 'โรงพยาบาลตาลสุม',
@@ -67,14 +70,17 @@ const router = (fastify, { }, next) => {
     //   create_time: '03:24:18',
     //   status_flg: 'Y'
     // }
-    console.log(info);
+    // console.log(info);
     try {
       const rs: any = await alertModel.insert(db, info);
       reply.code(HttpStatus.OK).send({ info: rs })
-
       const topic = process.env.ALERT_CENTER_TOPIC;
       fastify.mqttClient.publish(topic, 'update alert', { qos: 0, retain: false });
-
+      // console.log(rs);
+      if (rs[0]) {
+        let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
+        const rs_bot: any = botlineModel.botLine(messages);
+      }
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
@@ -89,6 +95,12 @@ const router = (fastify, { }, next) => {
     try {
       const rs: any = await alertModel.update(db, alertId, info);
       reply.code(HttpStatus.OK).send({ info: rs })
+      // console.log(rs);
+      if (rs) {
+        let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} วันที่ตอบรับ :${info.ans_date} เวลา :${info.ans_time} หมายเหตุ :${info.message}`;
+        const rs_bot: any = botlineModel.botLine(messages);
+      }
+
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
@@ -96,7 +108,6 @@ const router = (fastify, { }, next) => {
 
   fastify.delete('/remove/:userId', async (req: fastify.Request, reply: fastify.Reply) => {
     const alertId: any = req.params.alertId;
-
     try {
       await alertModel.remove(db, alertId);
       reply.status(HttpStatus.OK).send({ statusCode: HttpStatus.OK })
@@ -105,9 +116,7 @@ const router = (fastify, { }, next) => {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
   })
-
   next();
-
 }
 
 module.exports = router;
