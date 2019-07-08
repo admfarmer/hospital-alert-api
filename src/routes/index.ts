@@ -7,6 +7,7 @@ import { AlertModel } from '../models/alert';
 import { BotlineModel } from '../models/botline';
 
 import * as HttpStatus from 'http-status-codes';
+import * as moment from 'moment';
 
 const alertModel = new AlertModel();
 const botlineModel = new BotlineModel();
@@ -60,29 +61,40 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
-    // console.log(req.body);
-    const info: any = req.body;
-    // let info = {
-    //   hos_name: 'โรงพยาบาลตาลสุม',
-    //   amphur: '3420',
-    //   province: '34',
-    //   create_date: '2019-07-01',
-    //   create_time: '03:24:18',
-    //   status_flg: 'Y'
-    // }
+    // console.log(req);
+    const _info: any = req.body;
+    let hos_name: any = _info.hos_name;
+    let amphur: any = _info.amphur;
+    let province: any = _info.province;
+    let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
+    let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
+    let status_flg: any = _info.status_flg || 'Y';
+
+    const info: any = {
+      hos_name: hos_name,
+      amphur: amphur,
+      province: province,
+      create_date: moment(create_date).format('YYYY-MM-DD'),
+      create_time: create_time,
+      status_flg: status_flg
+    }
     // console.log(info);
-    try {
-      const rs: any = await alertModel.insert(db, info);
-      reply.code(HttpStatus.OK).send({ info: rs })
-      const topic = process.env.ALERT_CENTER_TOPIC;
-      fastify.mqttClient.publish(topic, 'update alert', { qos: 0, retain: false });
-      // console.log(rs);
-      if (rs[0]) {
-        let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
-        const rs_bot: any = botlineModel.botLine(messages);
+    if (hos_name && amphur && province) {
+      try {
+        const rs: any = await alertModel.insert(db, info);
+        // console.log(rs);
+        if (rs[0]) {
+          reply.code(HttpStatus.OK).send({ info: rs })
+          const topic = process.env.ALERT_CENTER_TOPIC;
+          fastify.mqttClient.publish(topic, 'update alert', { qos: 0, retain: false });
+          let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
+          const rs_bot: any = botlineModel.botLine(messages);
+        }
+      } catch (error) {
+        reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
       }
-    } catch (error) {
-      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    } else {
+      reply.code(HttpStatus.FAILED_DEPENDENCY).send({ info: false });
     }
   });
 
@@ -94,9 +106,9 @@ const router = (fastify, { }, next) => {
 
     try {
       const rs: any = await alertModel.update(db, alertId, info);
-      reply.code(HttpStatus.OK).send({ info: rs })
       // console.log(rs);
       if (rs) {
+        reply.code(HttpStatus.OK).send({ info: rs })
         let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} วันที่ตอบรับ :${info.ans_date} เวลา :${info.ans_time} หมายเหตุ :${info.message}`;
         const rs_bot: any = botlineModel.botLine(messages);
       }
