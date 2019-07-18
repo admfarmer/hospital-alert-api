@@ -90,6 +90,7 @@ app.register(require('./plugins/mqtt'), {
 });
 
 app.register(require('./routes/index'), { prefix: '/v1', logger: true });
+app.register(require('./routes/login'), { prefix: '/v1/login', logger: true });
 
 app.get('/', async (req: fastify.Request, reply: fastify.Reply) => {
   reply.code(200).send({ message: 'Welcome to SMART HIS API services!', version: '1.0 build 20190522-1' })

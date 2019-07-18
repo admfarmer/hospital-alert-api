@@ -30,18 +30,21 @@ const router = (fastify, { }, next) => {
     }
   });
 
-  fastify.get('/alertStart', async (req: fastify.Request, reply: fastify.Reply) => {
+  fastify.get('/alertStart/:province', async (req: fastify.Request, reply: fastify.Reply) => {
+    const province: any = req.params.province;
     try {
-      const rs: any = await alertModel.getAlertStart(db);
+      const rs: any = await alertModel.getAlertStart(db, province);
       reply.code(HttpStatus.OK).send({ info: rs })
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
   });
 
-  fastify.get('/alertStop', async (req: fastify.Request, reply: fastify.Reply) => {
+  fastify.get('/alertStop/:province', async (req: fastify.Request, reply: fastify.Reply) => {
+    const province: any = req.params.province;
+
     try {
-      const rs: any = await alertModel.getAlertStop(db);
+      const rs: any = await alertModel.getAlertStop(db, province);
       reply.code(HttpStatus.OK).send({ info: rs })
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
@@ -66,6 +69,7 @@ const router = (fastify, { }, next) => {
     let hos_name: any = _info.hos_name;
     let amphur: any = _info.amphur;
     let province: any = _info.province;
+    let remark: any = _info.remark;
     let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
     let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
     let status_flg: any = _info.status_flg || 'Y';
@@ -74,6 +78,7 @@ const router = (fastify, { }, next) => {
       hos_name: hos_name,
       amphur: amphur,
       province: province,
+      remark: remark,
       create_date: moment(create_date).format('YYYY-MM-DD'),
       create_time: create_time,
       status_flg: status_flg
@@ -85,8 +90,10 @@ const router = (fastify, { }, next) => {
         // console.log(rs);
         if (rs[0]) {
           reply.code(HttpStatus.OK).send({ info: rs })
-          const topic = process.env.ALERT_CENTER_TOPIC;
-          fastify.mqttClient.publish(topic, 'update alert', { qos: 0, retain: false });
+          const topic = `${process.env.ALERT_CENTER_TOPIC}/${province}`;
+          let message = JSON.stringify(`alert`);
+
+          fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
           let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
           const rs_bot: any = botlineModel.botLine(messages);
         }
@@ -109,6 +116,9 @@ const router = (fastify, { }, next) => {
       // console.log(rs);
       if (rs) {
         reply.code(HttpStatus.OK).send({ info: rs })
+        const topic = `${process.env.ALERT_CENTER_TOPIC}/${info.province}`;
+        let message = JSON.stringify(`update`);
+        fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
         let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} วันที่ตอบรับ :${info.ans_date} เวลา :${info.ans_time} หมายเหตุ :${info.message}`;
         const rs_bot: any = botlineModel.botLine(messages);
       }

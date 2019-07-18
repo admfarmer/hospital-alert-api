@@ -8,7 +8,7 @@ export class AlertModel {
     return db(this.tableName)
   }
 
-  getAlertStart(db: knex) {
+  getAlertStart(db: knex, province: any) {
     return db('alert_log as l')
       .select('l.*')
       .select(db.raw(`a.AMPHUR_NAME as amp_name`))
@@ -16,10 +16,11 @@ export class AlertModel {
       .innerJoin('alert_amphur as a', { 'a.AMPHUR_CODE': 'l.amphur' })
       .innerJoin('alert_province as p', { 'p.PROVINCE_CODE': 'l.province' })
       .where('l.status_flg', 'Y')
+      .where('l.province', province)
       .orderBy('l.id', 'DESC');
   }
 
-  getAlertStop(db: knex) {
+  getAlertStop(db: knex, province: any) {
     return db('alert_log as l')
       .select('l.*')
       .select(db.raw(`a.AMPHUR_NAME as amp_name`))
@@ -27,6 +28,7 @@ export class AlertModel {
       .innerJoin('alert_amphur as a', { 'a.AMPHUR_CODE': 'l.amphur' })
       .innerJoin('alert_province as p', { 'p.PROVINCE_CODE': 'l.province' })
       .where('l.status_flg', 'N')
+      .where('l.province', province)
       .orderBy('l.id', 'DESC');
   }
 
