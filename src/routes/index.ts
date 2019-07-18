@@ -5,12 +5,14 @@ import * as fastify from 'fastify';
 
 import { AlertModel } from '../models/alert';
 import { BotlineModel } from '../models/botline';
+import { TokenModel } from '../models/token';
 
 import * as HttpStatus from 'http-status-codes';
 import * as moment from 'moment';
 
 const alertModel = new AlertModel();
 const botlineModel = new BotlineModel();
+const tokenModel = new TokenModel();
 
 const router = (fastify, { }, next) => {
 
@@ -86,6 +88,7 @@ const router = (fastify, { }, next) => {
     // console.log(info);
     if (hos_name && amphur && province) {
       try {
+
         const rs: any = await alertModel.insert(db, info);
         // console.log(rs);
         if (rs[0]) {
@@ -94,8 +97,13 @@ const router = (fastify, { }, next) => {
           let message = JSON.stringify(`alert`);
 
           fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
+
+          const _token = await tokenModel.info(db, info.amphur, info.province)
+          // console.log(_token[0].line_token);
+          let token = _token[0].line_token;
+
           let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
-          const rs_bot: any = botlineModel.botLine(messages);
+          const rs_bot: any = botlineModel.botLine(messages, token);
         }
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
@@ -112,6 +120,7 @@ const router = (fastify, { }, next) => {
     // console.log(info);
 
     try {
+
       const rs: any = await alertModel.update(db, alertId, info);
       // console.log(rs);
       if (rs) {
@@ -119,8 +128,13 @@ const router = (fastify, { }, next) => {
         const topic = `${process.env.ALERT_CENTER_TOPIC}/${info.province}`;
         let message = JSON.stringify(`update`);
         fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
+
+        const _token = await tokenModel.info(db, info.amphur, info.province)
+        // console.log(_token[0].line_token);
+        let token = _token[0].line_token;
+
         let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} วันที่ตอบรับ :${info.ans_date} เวลา :${info.ans_time} หมายเหตุ :${info.message}`;
-        const rs_bot: any = botlineModel.botLine(messages);
+        const rs_bot: any = botlineModel.botLine(messages, token);
       }
 
     } catch (error) {
