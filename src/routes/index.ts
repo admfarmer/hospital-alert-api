@@ -7,6 +7,8 @@ import { AlertModel } from '../models/alert';
 import { BotlineModel } from '../models/botline';
 import { TokenModel } from '../models/token';
 import { DistModel } from '../models/dist';
+import { StatusModel } from '../models/status';
+
 
 import * as HttpStatus from 'http-status-codes';
 import * as moment from 'moment';
@@ -15,6 +17,7 @@ const alertModel = new AlertModel();
 const botlineModel = new BotlineModel();
 const tokenModel = new TokenModel();
 const distModel = new DistModel();
+const statusModel = new StatusModel();
 
 const router = (fastify, { }, next) => {
 
@@ -175,6 +178,55 @@ const router = (fastify, { }, next) => {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
   })
+
+  fastify.post('/alertStatus', async (req: fastify.Request, reply: fastify.Reply) => {
+    console.log(req.body);
+    const _info: any = req.body;
+    let hcode = _info.hcode;
+    let hosname = _info.hosname;
+    let status_flg = _info.status_flg || 'Y';
+    let create_date = _info.create_date || moment(Date()).format('YYYY-MM-DD');
+    let create_time = _info.create_time || moment(Date()).format('HH:mm:ss');
+
+    let infoInsert = {
+      hcode: hcode,
+      hosname: hosname,
+      status_flg: status_flg,
+      create_date: create_date,
+      create_time: create_time,
+    }
+
+    let infoUpdate = {
+      hosname: hosname,
+      status_flg: status_flg,
+      create_date: create_date,
+      create_time: create_time,
+    }
+    const _dist = await statusModel.getSelect(db, hcode);
+    console.log(_dist[0]);
+    let _xx: string = _dist[0];
+
+    if (!_xx) {
+      try {
+        const rs: any = await statusModel.insert(db, infoInsert);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      } catch (error) {
+        reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+      }
+    } else {
+      try {
+        const rs: any = await statusModel.update(db, hcode, infoUpdate);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      } catch (error) {
+        reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+      }
+
+    }
+  });
+
+
+
+
   next();
 }
 
