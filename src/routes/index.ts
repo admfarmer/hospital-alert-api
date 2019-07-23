@@ -104,7 +104,7 @@ const router = (fastify, { }, next) => {
       }
     }
     // console.log(info);
-    if (hos_name && amphur && province && this.info.remark) {
+    if (hos_name && amphur && province && this.info.remark && this.info.hcode) {
       try {
 
         const rs: any = await alertModel.insert(db, this.info);
