@@ -120,7 +120,7 @@ const router = (fastify, { }, next) => {
           let token = _token[0].line_token;
           let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
-          let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} เวลา :${this.info.create_time} ข้อความ : ${remark}`;
+          let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} เวลา :${this.info.create_time} ข้อความ : ${this.info.remark}`;
           const rs_bot: any = await botlineModel.botLine(messages, token);
           const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
         }
