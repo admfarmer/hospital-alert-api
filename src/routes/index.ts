@@ -78,6 +78,7 @@ const router = (fastify, { }, next) => {
     let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
     let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
     let status_flg: any = _info.status_flg || 'Y';
+
     if (type == 'iot') {
       this.info = {
         hos_name: hos_name,
@@ -100,7 +101,7 @@ const router = (fastify, { }, next) => {
       }
     }
     // console.log(info);
-    if (hos_name && amphur && province && remark) {
+    if (hos_name && amphur && province && this.info.remark) {
       try {
 
         const rs: any = await alertModel.insert(db, this.info);
