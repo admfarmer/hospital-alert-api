@@ -8,18 +8,24 @@ export class StatusModel {
     return db(this.tableName)
   }
 
-  getSelect(db: knex, hcode: any) {
+  getSelect(db: knex, hcode: any, hosname: any) {
     return db(this.tableName).select('hcode')
-      .where('hcode', hcode)
+      .where({
+        hcode: hcode,
+        hosname: hosname
+      })
   }
 
   insert(db: knex, info: any) {
     return db(this.tableName).insert(info);
   }
 
-  update(db: knex, hcode: any, info: any) {
+  update(db: knex, hcode: any, hosname: any, info: any) {
     return db(this.tableName)
-      .where('hcode', hcode)
+      .where({
+        hcode: hcode,
+        hosname: hosname
+      })
       .update(info);
   }
 

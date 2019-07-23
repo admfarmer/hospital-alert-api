@@ -197,16 +197,16 @@ const router = (fastify, { }, next) => {
     }
 
     let infoUpdate = {
-      hosname: hosname,
       status_flg: status_flg,
       create_date: create_date,
       create_time: create_time,
     }
-    const _dist = await statusModel.getSelect(db, hcode);
+    const _dist = await statusModel.getSelect(db, hcode, hosname);
     console.log(_dist[0]);
-    let _xx: string = _dist[0];
+    let _hcode: string = _dist[0];
+    // console.log(_hcode);
 
-    if (!_xx) {
+    if (!_hcode) {
       try {
         const rs: any = await statusModel.insert(db, infoInsert);
         reply.code(HttpStatus.OK).send({ info: rs })
@@ -215,7 +215,7 @@ const router = (fastify, { }, next) => {
       }
     } else {
       try {
-        const rs: any = await statusModel.update(db, hcode, infoUpdate);
+        const rs: any = await statusModel.update(db, hcode, hosname, infoUpdate);
         reply.code(HttpStatus.OK).send({ info: rs })
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
