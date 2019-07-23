@@ -74,6 +74,7 @@ const router = (fastify, { }, next) => {
     let amphur: any = _info.amphur;
     let province: any = _info.province;
     let type: any = _info.type;
+    let hcode: any = _info.hcode;
     let remark: any = _info.remark;
     let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
     let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
@@ -84,6 +85,7 @@ const router = (fastify, { }, next) => {
         hos_name: hos_name,
         amphur: amphur,
         province: province,
+        hcode: hcode,
         remark: 'แจ้งเหตุห้องอุบัติฉุกเฉินโรงพยาบาล',
         create_date: moment(create_date).format('YYYY-MM-DD'),
         create_time: create_time,
@@ -94,6 +96,7 @@ const router = (fastify, { }, next) => {
         hos_name: hos_name,
         amphur: amphur,
         province: province,
+        hcode: hcode,
         remark: remark,
         create_date: moment(create_date).format('YYYY-MM-DD'),
         create_time: create_time,
@@ -115,7 +118,7 @@ const router = (fastify, { }, next) => {
 
           const _dist = await distModel.getDistcode(db, this.info.amphur);
           let distName = _dist[0].AMPHUR_NAME;
-          const _token = await tokenModel.info(db, this.info.amphur, this.info.province);
+          const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
           // console.log(_token[0].line_token);
           let token = _token[0].line_token;
           let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
@@ -151,7 +154,7 @@ const router = (fastify, { }, next) => {
         const _dist = await distModel.getDistcode(db, this.info.amphur);
         let distName = _dist[0].AMPHUR_NAME;
 
-        const _token = await tokenModel.info(db, this.info.amphur, this.info.province)
+        const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
         // console.log(_token[0].line_token);
         let token = _token[0].line_token;
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
