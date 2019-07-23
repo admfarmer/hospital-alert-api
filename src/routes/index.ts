@@ -136,10 +136,12 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.put('/update/:alertId', async (req: fastify.Request, reply: fastify.Reply) => {
-    // console.log(req.body);
+    // console.log('xxx', req.body);
     this.info = req.body;
     const alertId: any = req.params.alertId;
-    // console.log(info);
+    // console.log('amphur', this.info.amphur);
+    // console.log('province', this.info.province);
+    // console.log('hcode', this.info.hcode);
 
     try {
 
@@ -155,7 +157,7 @@ const router = (fastify, { }, next) => {
         let distName = _dist[0].AMPHUR_NAME;
 
         const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
-        // console.log(_token[0].line_token);
+        // console.log(_token);
         let token = _token[0].line_token;
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
