@@ -106,7 +106,6 @@ const router = (fastify, { }, next) => {
     // console.log(info);
     if (hos_name && amphur && province && this.info.remark && this.info.hcode) {
       try {
-
         const rs: any = await alertModel.insert(db, this.info);
         // console.log(rs);
         if (rs[0]) {
@@ -136,20 +135,15 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.put('/update/:alertId', async (req: fastify.Request, reply: fastify.Reply) => {
-    // console.log('xxx', req.body);
     this.info = req.body;
     const alertId: any = req.params.alertId;
-    // console.log('amphur', this.info.amphur);
-    // console.log('province', this.info.province);
-    // console.log('hcode', this.info.hcode);
 
     try {
 
       const rs: any = await alertModel.update(db, alertId, this.info);
-      // console.log(rs);
       if (rs) {
         reply.code(HttpStatus.OK).send({ info: rs })
-        const topic = `${process.env.ALERT_CENTER_TOPIC}/${info.province}`;
+        const topic = `${process.env.ALERT_CENTER_TOPIC}/${this.info.province}`;
         let message = JSON.stringify(`update`);
         fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
 
@@ -157,7 +151,7 @@ const router = (fastify, { }, next) => {
         let distName = _dist[0].AMPHUR_NAME;
 
         const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
-        // console.log(_token);
+        // console.log(_token[0].line_token);
         let token = _token[0].line_token;
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
