@@ -6,6 +6,7 @@ import * as fastify from 'fastify';
 import { AlertModel } from '../models/alert';
 import { BotlineModel } from '../models/botline';
 import { TokenModel } from '../models/token';
+import { DistModel } from '../models/dist';
 
 import * as HttpStatus from 'http-status-codes';
 import * as moment from 'moment';
@@ -13,11 +14,12 @@ import * as moment from 'moment';
 const alertModel = new AlertModel();
 const botlineModel = new BotlineModel();
 const tokenModel = new TokenModel();
+const distModel = new DistModel();
 
 const router = (fastify, { }, next) => {
 
   var db: Knex = fastify.db;
-
+  var info: any;
   fastify.get('/', async (req: fastify.Request, reply: fastify.Reply) => {
     reply.code(200).send({ message: 'Welcome to SMART HIS API services!', version: '1.0 build 20190522-1' })
   });
@@ -71,25 +73,37 @@ const router = (fastify, { }, next) => {
     let hos_name: any = _info.hos_name;
     let amphur: any = _info.amphur;
     let province: any = _info.province;
+    let type: any = _info.type;
     let remark: any = _info.remark;
     let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
     let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
     let status_flg: any = _info.status_flg || 'Y';
-
-    const info: any = {
-      hos_name: hos_name,
-      amphur: amphur,
-      province: province,
-      remark: remark,
-      create_date: moment(create_date).format('YYYY-MM-DD'),
-      create_time: create_time,
-      status_flg: status_flg
+    if (type == 'iot') {
+      this.info = {
+        hos_name: hos_name,
+        amphur: amphur,
+        province: province,
+        remark: 'แจ้งเหตุห้องอุบัติฉุกเฉินโรงพยาบาล',
+        create_date: moment(create_date).format('YYYY-MM-DD'),
+        create_time: create_time,
+        status_flg: status_flg
+      }
+    } else {
+      this.info = {
+        hos_name: hos_name,
+        amphur: amphur,
+        province: province,
+        remark: remark,
+        create_date: moment(create_date).format('YYYY-MM-DD'),
+        create_time: create_time,
+        status_flg: status_flg
+      }
     }
     // console.log(info);
-    if (hos_name && amphur && province) {
+    if (hos_name && amphur && province && remark) {
       try {
 
-        const rs: any = await alertModel.insert(db, info);
+        const rs: any = await alertModel.insert(db, this.info);
         // console.log(rs);
         if (rs[0]) {
           reply.code(HttpStatus.OK).send({ info: rs })
@@ -98,12 +112,16 @@ const router = (fastify, { }, next) => {
 
           fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
 
-          const _token = await tokenModel.info(db, info.amphur, info.province)
+          const _dist = await distModel.getDistcode(db, this.info.amphur);
+          let distName = _dist[0].AMPHUR_NAME;
+          const _token = await tokenModel.info(db, this.info.amphur, this.info.province);
           // console.log(_token[0].line_token);
           let token = _token[0].line_token;
+          let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
-          let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} เวลา :${info.create_time}`;
-          const rs_bot: any = botlineModel.botLine(messages, token);
+          let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} เวลา :${this.info.create_time} ข้อความ : ${remark}`;
+          const rs_bot: any = await botlineModel.botLine(messages, token);
+          const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
         }
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
@@ -115,13 +133,13 @@ const router = (fastify, { }, next) => {
 
   fastify.put('/update/:alertId', async (req: fastify.Request, reply: fastify.Reply) => {
     // console.log(req.body);
-    const info: any = req.body;
+    this.info = req.body;
     const alertId: any = req.params.alertId;
     // console.log(info);
 
     try {
 
-      const rs: any = await alertModel.update(db, alertId, info);
+      const rs: any = await alertModel.update(db, alertId, this.info);
       // console.log(rs);
       if (rs) {
         reply.code(HttpStatus.OK).send({ info: rs })
@@ -129,12 +147,17 @@ const router = (fastify, { }, next) => {
         let message = JSON.stringify(`update`);
         fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
 
-        const _token = await tokenModel.info(db, info.amphur, info.province)
+        const _dist = await distModel.getDistcode(db, this.info.amphur);
+        let distName = _dist[0].AMPHUR_NAME;
+
+        const _token = await tokenModel.info(db, this.info.amphur, this.info.province)
         // console.log(_token[0].line_token);
         let token = _token[0].line_token;
+        let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
-        let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${info.hos_name} วันที่แจ้งเหตุ :${info.create_date} วันที่ตอบรับ :${info.ans_date} เวลา :${info.ans_time} หมายเหตุ :${info.message}`;
-        const rs_bot: any = botlineModel.botLine(messages, token);
+        let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} วันที่ตอบรับ :${this.info.ans_date} เวลา :${this.info.ans_time} หมายเหตุ :${this.info.message}`;
+        const rs_bot: any = await botlineModel.botLine(messages, token);
+        const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
       }
 
     } catch (error) {
