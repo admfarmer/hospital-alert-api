@@ -8,6 +8,23 @@ export class StatusModel {
     return db(this.tableName)
   }
 
+  getUpdate(db: knex) {
+    return db(this.tableName)
+      .where({
+        status_flg: 'Y'
+      })
+      .update({
+        status_flg: 'N'
+      });
+  }
+
+  getSelectDown(db: knex) {
+    return db(this.tableName)
+      .where({
+        status_flg: 'N'
+      })
+  }
+
   getSelect(db: knex, hcode: any, hosname: any) {
     return db(this.tableName).select('hcode')
       .where({

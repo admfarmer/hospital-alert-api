@@ -12,6 +12,7 @@ import { StatusModel } from '../models/status';
 
 import * as HttpStatus from 'http-status-codes';
 import * as moment from 'moment';
+var cron = require('node-cron');
 
 const alertModel = new AlertModel();
 const botlineModel = new BotlineModel();
@@ -224,8 +225,53 @@ const router = (fastify, { }, next) => {
     }
   });
 
+  fastify.get('/alertStatus/iotDown', async (req: fastify.Request, reply: fastify.Reply) => {
+    try {
+      const item: any = await statusModel.getSelectDown(db);
+      if (item[0]) {
+        let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
+        let create_date = moment(Date()).format('YYYY-MM-DD');
+        let create_time = moment(Date()).format('HH:mm:ss');
 
+        item.forEach(v => {
+          let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
+          // console.log(messages);
+          const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
+        });
+        reply.code(HttpStatus.OK).send({ info: item })
 
+      } else {
+        reply.code(501).send({ info: 'Not Data' })
+      }
+    } catch (error) {
+      // console.log(error);
+      reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
+    }
+  });
+
+  // วิธีการทำงานตามช่วงเวลา (job scheduler)
+  cron.schedule('*/5 * * * *', async function () {
+    console.log('running a itemUpdate');
+
+    const itemUpdate: any = await statusModel.getUpdate(db);
+    console.log(itemUpdate);
+
+    cron.schedule('*/5 * * * *', async function () {
+      console.log('running a token191ubon');
+
+      const item: any = await statusModel.getSelectDown(db);
+      console.log(item);
+      let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
+      let create_date = moment(Date()).format('YYYY-MM-DD');
+      let create_time = moment(Date()).format('HH:mm:ss');
+      item.forEach(v => {
+        let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
+        // console.log(messages);
+        const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
+      });
+    });
+
+  });
 
   next();
 }
