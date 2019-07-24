@@ -73,6 +73,7 @@ const router = (fastify, { }, next) => {
 
   fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
     // console.log(req);
+    var isodate = new Date().toISOString()
     const _info: any = req.body;
     let hos_name: any = _info.hos_name;
     let amphur: any = _info.amphur;
@@ -182,6 +183,7 @@ const router = (fastify, { }, next) => {
 
   fastify.post('/alertStatus', async (req: fastify.Request, reply: fastify.Reply) => {
     console.log(req.body);
+    var isodate = new Date().toISOString()
     const _info: any = req.body;
     let hcode = _info.hcode;
     let hosname = _info.hosname;
@@ -252,6 +254,7 @@ const router = (fastify, { }, next) => {
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
   cron.schedule('*/5 * * * *', async function () {
     console.log('running a itemUpdate');
+    var isodate = new Date().toISOString()
 
     const item: any = await statusModel.getSelectDown(db);
     console.log(item[0]);
