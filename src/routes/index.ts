@@ -21,7 +21,7 @@ const distModel = new DistModel();
 const statusModel = new StatusModel();
 
 const router = (fastify, { }, next) => {
-
+  var isodate = new Date().toISOString()
   var db: Knex = fastify.db;
   var info: any;
   fastify.get('/', async (req: fastify.Request, reply: fastify.Reply) => {
@@ -80,8 +80,8 @@ const router = (fastify, { }, next) => {
     let type: any = _info.type;
     let hcode: any = _info.hcode;
     let remark: any = _info.remark;
-    let create_date: any = _info.create_date || moment(Date()).format('YYYY-MM-DD');
-    let create_time: any = _info.create_time || moment(Date()).format('HH:mm:ss');
+    let create_date: any = _info.create_date || moment(isodate).format('YYYY-MM-DD');
+    let create_time: any = _info.create_time || moment(isodate).format('HH:mm:ss');
     let status_flg: any = _info.status_flg || 'Y';
 
     if (type == 'iot') {
@@ -186,8 +186,8 @@ const router = (fastify, { }, next) => {
     let hcode = _info.hcode;
     let hosname = _info.hosname;
     let status_flg = _info.status_flg || 'Y';
-    let create_date = _info.create_date || moment(Date()).format('YYYY-MM-DD');
-    let create_time = _info.create_time || moment(Date()).format('HH:mm:ss');
+    let create_date = _info.create_date || moment(isodate).format('YYYY-MM-DD');
+    let create_time = _info.create_time || moment(isodate).format('HH:mm:ss');
 
     let infoInsert = {
       hcode: hcode,
@@ -230,8 +230,8 @@ const router = (fastify, { }, next) => {
       const item: any = await statusModel.getSelectDown(db);
       if (item[0]) {
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
-        let create_date = moment(Date()).format('YYYY-MM-DD');
-        let create_time = moment(Date()).format('HH:mm:ss');
+        let create_date = moment(isodate).format('YYYY-MM-DD');
+        let create_time = moment(isodate).format('HH:mm:ss');
 
         item.forEach(v => {
           let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
@@ -257,8 +257,8 @@ const router = (fastify, { }, next) => {
     console.log(item[0]);
     if (item[0]) {
       let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
-      let create_date = moment(Date()).format('YYYY-MM-DD');
-      let create_time = moment(Date()).format('HH:mm:ss');
+      let create_date = moment(isodate).format('YYYY-MM-DD');
+      let create_time = moment(isodate).format('HH:mm:ss');
       item.forEach(v => {
         let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
         // console.log(messages);
