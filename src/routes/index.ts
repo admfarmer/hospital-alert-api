@@ -253,25 +253,22 @@ const router = (fastify, { }, next) => {
   cron.schedule('*/5 * * * *', async function () {
     console.log('running a itemUpdate');
 
-    const itemUpdate: any = await statusModel.getUpdate(db);
-    console.log(itemUpdate);
+    const item: any = await statusModel.getSelectDown(db);
+    console.log(item[0]);
+    if (item[0]) {
+      let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
+      let create_date = moment(Date()).format('YYYY-MM-DD');
+      let create_time = moment(Date()).format('HH:mm:ss');
+      item.forEach(v => {
+        let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
+        // console.log(messages);
+        const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
+      });
 
-    cron.schedule('*/5 * * * *', async function () {
-      console.log('running a token191ubon');
+      const itemUpdate: any = await statusModel.getUpdate(db);
+      console.log(itemUpdate);
 
-      const item: any = await statusModel.getSelectDown(db);
-      console.log(item[0]);
-      if (item[0]) {
-        let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
-        let create_date = moment(Date()).format('YYYY-MM-DD');
-        let create_time = moment(Date()).format('HH:mm:ss');
-        item.forEach(v => {
-          let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
-          // console.log(messages);
-          const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
-        });
-      }
-    });
+    }
 
   });
 
