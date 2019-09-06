@@ -182,7 +182,7 @@ const router = (fastify, { }, next) => {
   })
 
   fastify.post('/alertStatus', async (req: fastify.Request, reply: fastify.Reply) => {
-    console.log(req.body);
+    // console.log(req.body);
     var isodate = new Date().toISOString()
     const _info: any = req.body;
     let hcode = _info.hcode;
@@ -204,10 +204,13 @@ const router = (fastify, { }, next) => {
       create_date: create_date,
       create_time: create_time,
     }
-    const _dist = await statusModel.getSelect(db, hcode, hosname);
+    // console.log(_info.hcode);
+    // console.log(_info.hosname);
+
+    const _dist = await statusModel.getSelect(db, _info.hcode, _info.hosname);
     console.log(_dist[0]);
     let _hcode: string = _dist[0];
-    // console.log(_hcode);
+    console.log(_hcode);
 
     if (!_hcode) {
       try {
