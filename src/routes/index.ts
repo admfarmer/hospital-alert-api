@@ -123,16 +123,14 @@ const router = (fastify, { }, next) => {
           const _dist = await distModel.getDistcode(db, this.info.amphur);
           let distName = _dist[0].AMPHUR_NAME;
           const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
-          // console.log(_token[0].line_token);
-          let token = _token[0].line_token;
           let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
-          console.log(token);
 
           let messages = `เลขที่แจ้งเหตุ : ${rs[0]} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} เวลา :${this.info.create_time} ข้อความ : ${this.info.remark}`;
-          if (token) {
+          const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
+          if (_token[0]) {
+            let token = _token[0].line_token;
             const rs_bot: any = await botlineModel.botLine(messages, token);
           }
-          const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
         }
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
@@ -160,15 +158,13 @@ const router = (fastify, { }, next) => {
 
         const _token = await tokenModel.info(db, this.info.amphur, this.info.province, this.info.hcode);
         // console.log(_token[0].line_token);
-        let token = _token[0].line_token;
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
-        console.log(token);
-
         let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} วันที่ตอบรับ :${this.info.ans_date} เวลา :${this.info.ans_time} หมายเหตุ :${this.info.message}`;
-        if (token) {
+        const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
+        if (_token[0]) {
+          let token = _token[0].line_token;
           const rs_bot: any = await botlineModel.botLine(messages, token);
         }
-        const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
       }
 
     } catch (error) {
