@@ -218,6 +218,11 @@ const router = (fastify, { }, next) => {
       try {
         const rs: any = await statusModel.insert(db, infoInsert);
         reply.code(HttpStatus.OK).send({ info: rs })
+        let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
+        let messages = `สถานบริการ : ${_info.hosname} Hospcode : ${_info.hcode} ระบบ Hospital Alert System ได้เพิ่มตัวส่งแบบกดปุ่มแจ้งเหตุ วันที่ :${create_date} เวลา :${create_time} `;
+        // console.log(messages);
+        const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
+
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
       }
