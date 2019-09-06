@@ -161,7 +161,9 @@ const router = (fastify, { }, next) => {
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`
 
         let messages = `เลขที่แจ้งเหตุ : ${alertId} สถานบริการ : ${this.info.hos_name} อำเภอ : ${distName} วันที่แจ้งเหตุ :${this.info.create_date} วันที่ตอบรับ :${this.info.ans_date} เวลา :${this.info.ans_time} หมายเหตุ :${this.info.message}`;
-        const rs_bot: any = await botlineModel.botLine(messages, token);
+        if (!token) {
+          const rs_bot: any = await botlineModel.botLine(messages, token);
+        }
         const rs_191ubon: any = await botlineModel.botLineToken(messages, token191ubon);
       }
 
