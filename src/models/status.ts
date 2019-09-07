@@ -41,7 +41,8 @@ export class StatusModel {
     return db(this.tableName)
       .where({
         hcode: hcode,
-        hosname: hosname
+        hosname: hosname,
+        status_flg: 'N'
       })
       .update(info);
   }
