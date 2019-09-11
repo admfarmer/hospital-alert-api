@@ -279,6 +279,7 @@ const router = (fastify, { }, next) => {
           // console.log(messages);
           const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
           item = null;
+          messages = null;
         });
         const itemUpdate: any = await statusModel.getUpdate(db);
       }
