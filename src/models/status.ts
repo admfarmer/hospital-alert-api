@@ -5,7 +5,7 @@ export class StatusModel {
   tableName: string = 'alert_device_status';
 
   getInfo(db: knex) {
-    return db(this.tableName)
+    return db(this.tableName);
   }
 
   getUpdate(db: knex) {
@@ -22,7 +22,7 @@ export class StatusModel {
     return db(this.tableName)
       .where({
         status_flg: 'N'
-      })
+      });
   }
 
   getSelect(db: knex, hcode: any, hosname: any) {
@@ -30,7 +30,7 @@ export class StatusModel {
       .where({
         hcode: hcode,
         hosname: hosname
-      })
+      });
   }
 
   insert(db: knex, info: any) {
