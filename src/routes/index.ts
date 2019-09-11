@@ -284,8 +284,11 @@ const router = (fastify, { }, next) => {
         });
         item = [null];
         messages = null;
+        const itemUpdate: any = await statusModel.getUpdate(db);
+      } else {
+        const itemUpdate: any = await statusModel.getUpdate(db);
+
       }
-      const itemUpdate: any = await statusModel.getUpdate(db);
     } catch (error) {
       console.log(error);
     }
