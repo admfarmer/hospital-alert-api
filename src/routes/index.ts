@@ -265,10 +265,10 @@ const router = (fastify, { }, next) => {
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
   cron.schedule('*/60 * * * *', async function () {
     console.log('running a itemUpdate');
-
+    var item: any = null;
     try {
       var isodate = new Date().toISOString();
-      var item: any = await statusModel.getSelectDown(db);
+      item = await statusModel.getSelectDown(db);
       console.log(item[0]);
       if (item[0]) {
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`;
