@@ -35,7 +35,7 @@ export class StatusModel {
     return db(this.tableName)
       .where('hcode', hcode)
       .andWhere('hosname', hosname)
-      // .andWhere('status_flg', 'N')
+      .andWhere('status_flg', 'N')
       .update(info);
   }
 
