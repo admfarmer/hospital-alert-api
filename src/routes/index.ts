@@ -270,7 +270,7 @@ const router = (fastify, { }, next) => {
     try {
       var isodate = new Date().toISOString();
       item = await statusModel.getSelectDown(db);
-      console.log(item[0]);
+      console.log(item);
       if (item[0]) {
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`;
         let create_date = moment(isodate).format('YYYY-MM-DD');
@@ -282,9 +282,8 @@ const router = (fastify, { }, next) => {
           item = null;
           messages = null;
         });
-        const itemUpdate: any = await statusModel.getUpdate(db);
       }
-      // const itemUpdate: any = await statusModel.getUpdate(db);
+      const itemUpdate: any = await statusModel.getUpdate(db);
       // console.log(itemUpdate);
     } catch (error) {
       console.log(error);

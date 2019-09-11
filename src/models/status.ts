@@ -10,7 +10,7 @@ export class StatusModel {
 
   getUpdate(db: knex) {
     return db(this.tableName)
-      .where('status_flg', 'N')
+      .where('status_flg', 'Y')
       .update({
         status_flg: 'N'
       });
@@ -35,7 +35,7 @@ export class StatusModel {
     return db(this.tableName)
       .where('hcode', hcode)
       .andWhere('hosname', hosname)
-      .andWhere('status_flg', 'N')
+      // .andWhere('status_flg', 'N')
       .update(info);
   }
 
