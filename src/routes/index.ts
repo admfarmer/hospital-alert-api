@@ -263,7 +263,7 @@ const router = (fastify, { }, next) => {
   });
 
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
-  cron.schedule('*/60 * * * *', async function () {
+  cron.schedule('*/2 * * * *', async function () {
     console.log('running a itemUpdate');
     var item: any = null;
     var messages: any = null;
