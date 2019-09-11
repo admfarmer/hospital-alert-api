@@ -33,11 +33,9 @@ export class StatusModel {
 
   update(db: knex, hcode: any, hosname: any, info: any) {
     return db(this.tableName)
-      .where({
-        hcode: hcode,
-        hosname: hosname,
-        status_flg: 'N'
-      })
+      .where('hcode', hcode)
+      .andWhere('hosname', hosname)
+      .andWhere('status_flg', 'N')
       .update(info);
   }
 
