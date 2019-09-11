@@ -10,9 +10,7 @@ export class StatusModel {
 
   getUpdate(db: knex) {
     return db(this.tableName)
-      .where({
-        status_flg: 'Y'
-      })
+      .where('status_flg', 'N')
       .update({
         status_flg: 'N'
       });
@@ -20,17 +18,13 @@ export class StatusModel {
 
   getSelectDown(db: knex) {
     return db(this.tableName)
-      .where({
-        status_flg: 'N'
-      });
+      .where('status_flg', 'N');
   }
 
   getSelect(db: knex, hcode: any, hosname: any) {
     return db(this.tableName).select('hcode')
-      .where({
-        hcode: hcode,
-        hosname: hosname
-      });
+      .where('hcode', hcode)
+      .andWhere('hosname', hosname);
   }
 
   insert(db: knex, info: any) {
