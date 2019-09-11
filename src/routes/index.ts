@@ -266,6 +266,7 @@ const router = (fastify, { }, next) => {
   cron.schedule('*/60 * * * *', async function () {
     console.log('running a itemUpdate');
     var item: any = null;
+    var messages: any = null;
     try {
       var isodate = new Date().toISOString();
       item = await statusModel.getSelectDown(db);
@@ -275,7 +276,7 @@ const router = (fastify, { }, next) => {
         let create_date = moment(isodate).format('YYYY-MM-DD');
         let create_time = moment(isodate).format('HH:mm:ss');
         item.forEach(v => {
-          let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
+          messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
           // console.log(messages);
           const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
           item = null;
