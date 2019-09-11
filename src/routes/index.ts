@@ -263,7 +263,7 @@ const router = (fastify, { }, next) => {
   });
 
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
-  cron.schedule('*/10 * * * *', async function () {
+  cron.schedule('*/61 * * * *', async function () {
     console.log('running a itemUpdate');
     try {
       var item: any = [null];
@@ -277,7 +277,6 @@ const router = (fastify, { }, next) => {
         info = 'N'
       }
       if (info === 'Y') {
-        console.log(info);
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`;
         let create_date = moment(isodate).format('YYYY-MM-DD');
         let create_time = moment(isodate).format('HH:mm:ss');
@@ -293,7 +292,6 @@ const router = (fastify, { }, next) => {
         messages = null;
         const itemUpdate: any = await statusModel.getUpdate(db);
       } else {
-        console.log(info);
         item = [null];
         messages = null;
         const itemUpdate: any = await statusModel.getUpdate(db);
