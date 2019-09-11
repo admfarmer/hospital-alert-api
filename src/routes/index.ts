@@ -277,6 +277,7 @@ const router = (fastify, { }, next) => {
           let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
           // console.log(messages);
           const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
+          this.item = null;
         });
         const itemUpdate: any = await statusModel.getUpdate(db);
       }
