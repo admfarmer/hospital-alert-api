@@ -284,9 +284,8 @@ const router = (fastify, { }, next) => {
         });
         item = null;
         messages = null;
+        const itemUpdate: any = await statusModel.getUpdate(db);
       }
-      const itemUpdate: any = await statusModel.getUpdate(db);
-      // console.log(itemUpdate);
     } catch (error) {
       console.log(error);
     }
