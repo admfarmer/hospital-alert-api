@@ -265,9 +265,10 @@ const router = (fastify, { }, next) => {
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
   cron.schedule('*/60 * * * *', async function () {
     console.log('running a itemUpdate');
+
     try {
       var isodate = new Date().toISOString();
-      const item: any = await statusModel.getSelectDown(db);
+      var item: any = await statusModel.getSelectDown(db);
       console.log(item[0]);
       if (item[0]) {
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`;
@@ -277,7 +278,7 @@ const router = (fastify, { }, next) => {
           let messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
           // console.log(messages);
           const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
-          this.item = null;
+          item = null;
         });
         const itemUpdate: any = await statusModel.getUpdate(db);
       }
