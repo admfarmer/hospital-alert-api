@@ -266,7 +266,7 @@ const router = (fastify, { }, next) => {
   cron.schedule('*/10 * * * *', async function () {
     console.log('running a itemUpdate');
     try {
-      var item: any = null;
+      var item: any = [null];
       var isodate = new Date().toISOString();
       item = await statusModel.getSelectDown(db);
       console.log(item);
@@ -282,7 +282,7 @@ const router = (fastify, { }, next) => {
           const rs_191ubon: any = botlineModel.botLineToken(messages, token191ubon);
           messages = null;
         });
-        item = null;
+        item = [null];
         messages = null;
         const itemUpdate: any = await statusModel.getUpdate(db);
       }
