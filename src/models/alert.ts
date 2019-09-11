@@ -38,7 +38,6 @@ export class AlertModel {
 
   insert(db: knex, info: any) {
     console.log('insert :', info);
-
     return db(this.tableName).insert(info);
   }
 
