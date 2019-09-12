@@ -263,25 +263,21 @@ const router = (fastify, { }, next) => {
   });
 
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
-  cron.schedule('*/61 * * * *', async function () {
+  cron.schedule('*/2 * * * *', async function () {
     console.log('running a itemUpdate');
     try {
       var item: any = [null];
       var info: any = null;
       var isodate = new Date().toISOString();
       item = await statusModel.getSelectDown(db);
-      console.log(item);
-      if (item[0]) {
-        info = 'Y'
-      } else {
-        info = 'N'
-      }
-      if (info === 'Y') {
+      if (item[0] != [null]) {
+
         let token191ubon = `nI6C9J7q7HDl3P3ZiItY5PzzY4dbttbu0cfAD6dSJHo`;
         let create_date = moment(isodate).format('YYYY-MM-DD');
         let create_time = moment(isodate).format('HH:mm:ss');
         var messages: any = null;
 
+        console.log(item);
         item.forEach(v => {
           messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
           // console.log(messages);
