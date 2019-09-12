@@ -263,7 +263,7 @@ const router = (fastify, { }, next) => {
   });
 
   // วิธีการทำงานตามช่วงเวลา (job scheduler)
-  cron.schedule('*/2 * * * *', async function () {
+  cron.schedule('*/60 * * * *', async function () {
     console.log('running a itemUpdate');
     try {
       var item: any = [null];
@@ -278,6 +278,7 @@ const router = (fastify, { }, next) => {
         var messages: any = null;
 
         console.log(item);
+
         item.forEach(v => {
           messages = `สถานบริการ : ${v.hosname} Hospcode : ${v.hcode} ระบบ Hospital Alert System ติดต่อไม่ได้ วันที่ :${create_date} เวลา :${create_time} `;
           // console.log(messages);
