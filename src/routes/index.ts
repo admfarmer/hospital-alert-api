@@ -84,13 +84,19 @@ const router = (fastify, { }, next) => {
     let create_date: any = _info.create_date || moment(isodate).format('YYYY-MM-DD');
     let create_time: any = _info.create_time || moment(isodate).format('HH:mm:ss');
     let status_flg: any = _info.status_flg || 'Y';
-
+    let xx = await tokenModel.info(db, amphur, province, hcode);
+    let x: any;
+    if (xx[0]) {
+      x = xx[0];
+    }
     if (type == 'iot') {
       this.info = {
         hos_name: hos_name,
         amphur: amphur,
         province: province,
         hcode: hcode,
+        telephone: x.telephone,
+        coordinator: x.coordinator,
         remark: 'แจ้งเหตุห้องอุบัติฉุกเฉินโรงพยาบาล',
         create_date: moment(create_date).format('YYYY-MM-DD'),
         create_time: create_time,
@@ -102,6 +108,8 @@ const router = (fastify, { }, next) => {
         amphur: amphur,
         province: province,
         hcode: hcode,
+        telephone: x.telephone,
+        coordinator: x.coordinator,
         remark: remark,
         create_date: moment(create_date).format('YYYY-MM-DD'),
         create_time: create_time,
@@ -111,6 +119,7 @@ const router = (fastify, { }, next) => {
     // console.log(info);
     if (hos_name && amphur && province && this.info.remark && this.info.hcode) {
       try {
+
         const rs: any = await alertModel.insert(db, this.info);
         // console.log(rs);
         if (rs[0]) {
