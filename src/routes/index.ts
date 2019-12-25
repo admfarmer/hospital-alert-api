@@ -88,6 +88,10 @@ const router = (fastify, { }, next) => {
     let x: any;
     if (xx[0]) {
       x = xx[0];
+    } else {
+      x.telephone = '';
+      x.coordinator = '';
+
     }
     if (type == 'iot') {
       this.info = {
