@@ -41,8 +41,13 @@ const router = (fastify, { }, next) => {
   fastify.get('/alertStart/:province', async (req: fastify.Request, reply: fastify.Reply) => {
     const province: any = req.params.province;
     try {
-      const rs: any = await alertModel.getAlertStart(db, province);
-      reply.code(HttpStatus.OK).send({ info: rs })
+      if (province > 100) {
+        const rs: any = await alertModel.getAlertStartAmp(db, province);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      } else {
+        const rs: any = await alertModel.getAlertStart(db, province);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      }
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
@@ -52,8 +57,13 @@ const router = (fastify, { }, next) => {
     const province: any = req.params.province;
 
     try {
-      const rs: any = await alertModel.getAlertStop(db, province);
-      reply.code(HttpStatus.OK).send({ info: rs })
+      if (province > 100) {
+        const rs: any = await alertModel.getAlertStopAmp(db, province);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      } else {
+        const rs: any = await alertModel.getAlertStop(db, province);
+        reply.code(HttpStatus.OK).send({ info: rs })
+      }
     } catch (error) {
       reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
     }
