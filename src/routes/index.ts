@@ -72,7 +72,7 @@ const router = (fastify, { }, next) => {
   });
 
   fastify.post('/insert', async (req: fastify.Request, reply: fastify.Reply) => {
-    // console.log(req);
+    console.log(req.body);
     var isodate = new Date().toISOString()
     const _info: any = req.body;
     let hos_name: any = _info.hos_name;
@@ -120,18 +120,21 @@ const router = (fastify, { }, next) => {
         status_flg: status_flg
       }
     }
-    // console.log(info);
+    console.log(this.info);
     if (hos_name && amphur && province && this.info.remark && this.info.hcode) {
       try {
 
         const rs: any = await alertModel.insert(db, this.info);
-        // console.log(rs);
+        console.log(rs);
         if (rs[0]) {
           reply.code(HttpStatus.OK).send({ info: rs })
           const topic = `${process.env.ALERT_CENTER_TOPIC}/${province}`;
           let message = JSON.stringify(`alert`);
-
           fastify.mqttClient.publish(topic, message, { qos: 0, retain: false });
+
+          const topicamp = `${process.env.ALERT_CENTER_TOPIC}/${amphur}`;
+          let messageamp = JSON.stringify(`alert`);
+          fastify.mqttClient.publish(topicamp, messageamp, { qos: 0, retain: false });
 
           const _dist = await distModel.getDistcode(db, this.info.amphur);
           let distName = _dist[0].AMPHUR_NAME;
@@ -145,6 +148,9 @@ const router = (fastify, { }, next) => {
             const rs_bot: any = await botlineModel.botLine(messages, token);
           }
         }
+
+
+        reply.code(HttpStatus.OK).send({ info: info })
       } catch (error) {
         reply.code(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: HttpStatus.getStatusText(HttpStatus.INTERNAL_SERVER_ERROR) })
       }
